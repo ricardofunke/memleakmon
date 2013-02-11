@@ -15,13 +15,12 @@ percent_usage() {
 
 
 do_monitor() {
-  read OC OU <<< $(jstat -gcold $JAVA_PID 3000 1 | sed '1d' | awk '{print $3,$4}')
-  echo $OC $OU
+  jstat -gcold $JAVA_PID 3000 1 | sed '1d' | awk '{print $3,$4}'
 }
 
-run_dump() {
-    for n in {1..5}; do su $APP_USR -c "jstack $JAVA_PID > \"${TDUMP_FILE_DIR}/liferay-$n-$(hostname)-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
-    su $APP_USR -c "jmap -dump:format=b,file=\"${DUMP_FILE_DIR}/liferay-$(hostname)-$(date +%Y%m%d-%H%M%S).bin\" $JAVA_PID"
+run_dumps() {
+    su $APP_USR -c "jmap -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d-%H%M%S).mdump\" $JAVA_PID"
+    for n in {1..5}; do su $APP_USR -c "jstack $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$n-$(hostname)-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
     exit 0
 }
 
@@ -36,7 +35,7 @@ daemonize() {
     fi
 
     if [[ $verify -eq 4 ]]; then
-      run_dump
+      run_dumps
     fi
     sleep 15
   done
