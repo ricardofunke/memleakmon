@@ -19,8 +19,8 @@ do_monitor() {
 }
 
 run_dumps() {
-    su $APP_USR -c "jmap -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d-%H%M%S).mdump\" $JAVA_PID"
-    for n in {1..5}; do su $APP_USR -c "jstack $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$n-$(hostname)-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
+    su $APP_USR -c "jmap -F -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d-%H%M%S).mdump\" $JAVA_PID"
+    for n in {1..5}; do su $APP_USR -c "jstack -F $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$n-$(hostname)-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
     exit 0
 }
 
@@ -28,13 +28,13 @@ daemonize() {
   while true; do
     mem_usage=$(percent_usage $(do_monitor))
 
-    if [[ $mem_usage -gt 95 ]]; then
+    if [[ $mem_usage -ge 95 ]]; then
       (( verify++ ))
     else
       (( verify=0 ))
     fi
 
-    if [[ $verify -eq 4 ]]; then
+    if [[ $verify -ge 4 ]]; then
       run_dumps
     fi
     sleep 15
