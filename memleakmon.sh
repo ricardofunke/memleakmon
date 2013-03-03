@@ -4,7 +4,7 @@ APP_USR=tomcat
 MDUMP_FILE_DIR="/app"
 TDUMP_FILE_DIR="/app/threadDumps"
 
-JAVA_PID=$(pgrep java)
+JAVA_PID=$(pgrep java); if [[ $? -ne 0 ]]; then echo "No java pid running! Exiting..."; exit 1; fi
 
 percent_usage() {
   OC=${1%.*}
