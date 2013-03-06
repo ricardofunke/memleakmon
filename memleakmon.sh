@@ -20,7 +20,7 @@ do_monitor() {
 
 run_dumps() {
     su $APP_USR -c "jmap -F -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d-%H%M%S).mdump\" $JAVA_PID"
-    for n in {1..5}; do su $APP_USR -c "jstack -F $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$n-$(hostname)-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
+    for n in {1..5}; do su $APP_USR -c "jstack -F $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$(hostname)-$n-$(date +%Y%m%d-%H%M%S).tdump\""; sleep 5; done
     exit 0
 }
 
