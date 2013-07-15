@@ -3,6 +3,7 @@
 APP_USR=tomcat
 MDUMP_FILE_DIR="/app/dumps/memoryDumps"
 TDUMP_FILE_DIR="/app/dumps/threadDumps"
+ERROR_FILE=memleakmon.err
 
 JAVA_PID=$(pgrep java); if [[ $? -ne 0 ]]; then echo "No java pid running! Exiting..."; exit 1; fi
 
@@ -11,8 +12,8 @@ watch_mem() {
 }
 
 dump() {
-    su $APP_USR -c "jmap -F -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d%H).mdump\" $JAVA_PID"
-    for n in {1..5}; do su $APP_USR -c "jstack -F $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$(hostname)-$n-$(date +%Y%m%d%H).tdump\""; sleep 5; done
+    su $APP_USR -c "jmap -dump:format=b,file=\"${MDUMP_FILE_DIR}/jvm-$(hostname)-$(date +%Y%m%d%H).mdump\" $JAVA_PID" 2>> $ERROR_FILE 
+    for n in {1..5}; do su $APP_USR -c "jstack $JAVA_PID > \"${TDUMP_FILE_DIR}/jvm-$(hostname)-$n-$(date +%Y%m%d%H).tdump\"" 2>> $ERROR_FILE; sleep 5; done
     exit 0
 }
 
